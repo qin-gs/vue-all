@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>起步</title>
+  <script src="./vue@3.2.26.js"></script>
+</head>
+<body>
+
+<div id="todo-list-app">
+  <ol>
+    <!-- todo属性 将父组件的值传到子组件(声明 props 接收)-->
+    <todo-list v-for="item in groceryList"
+               v-bind:todo="item"
+               v-bind:key="item.id"></todo-list>
+  </ol>
+
+  <input v-model="inputMessage" placeholder="input" />
+  <p> message is {{ inputMessage }}</p>
+
+  <textarea v-model="multiMessage"></textarea>
+  <p> message is {{ multiMessage }}</p>
+
+  <input type="checkbox" id="checkbox" v-model="checked" />
+  <label for="checkbox">{{ checked }}</label>
+
+  <br />
+
+  <input type="checkbox" id="jack" value="Jack" v-model="checkedNames" />
+  <label for="jack">Jack</label>
+  <input type="checkbox" id="john" value="John" v-model="checkedNames" />
+  <label for="john">John</label>
+  <input type="checkbox" id="mike" value="Mike" v-model="checkedNames" />
+  <label for="mike">Mike</label>
+  <br />
+  <span>Checked names: {{ checkedNames }}</span>
+
+  <br />
+  <input type="radio" id="one" value="One" v-model="picked" />
+  <label for="one">One</label>
+  <br />
+  <input type="radio" id="two" value="Two" v-model="picked" />
+  <label for="two">Two</label>
+  <br />
+  <span>Picked: {{ picked }}</span>
+  <br />
+
+  <select v-model="selected">
+    <option disabled value="">Please select one</option>
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+  </select>
+  <span>Selected: {{ selected }}</span>
+  <br />
+
+  <select v-model="multiSelected" multiple>
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+  </select>
+  <br />
+  <span>Selected: {{ multiSelected }}</span>
+  <br />
+
+
+  <div :style="{ fontSize: postFontSize + 'em' }">
+    <blog-post v-for="post in posts"
+               :key="post.id"
+               :title="post.title"
+               @enlarge-text="postFontSize += $event"></blog-post>
+  </div>
+
+  <alert-box>
+    Something bad happened.
+  </alert-box>
+
+  <button v-for="tab in tabs"
+          v-bind:key="tab"
+          v-bind:class="['tab-button', { active: currentTab === tab }]"
+          v-on:click="currentTab = tab">
+    {{ tab }}
+  </button>
+  <!-- 用来显示不同的组件，currentTabComponent 可以是组件名-->
+  <!-- currentTabComponent 是一个计算属性，根据上面按钮的点击而切换 -->
+  <component v-bind:is="currentTabComponent" class="tab"></component>
+
+  <user-name v-model:first-name="firstName"
+             v-model:last-name="lastName">
+  </user-name>
+  <p>First name: {{ firstName }}</p>
+  <p>Last name: {{ lastName }}</p>
+
+  <br />
+
+  <my-component v-model.capitalize="myText">
+  </my-component>
+  {{ myText }}
+
+</div>
+
+
+</body>
+
+<script>
+
+  const TodoList = {
+    props: ['todo'], // 接收父组件传递的值
+    template: `
+      <li> {{ todo.text }}</li>`
+  }
+  let app = Vue.createApp({
+    data() {
+      return {
+        groceryList: [
+          {id: 0, text: 'Vegetables'},
+          {id: 1, text: 'Cheese'},
+          {id: 2, text: 'Whatever else humans are supposed to eat'}
+        ],
+        inputMessage: '',
+        multiMessage: '',
+        checked: '',
+        picked: '',
+        selected: '',
+        multiSelected: [],
+        firstName: '',
+        lastName: '',
+        myText: '',
+        checkedNames: [],
+        posts: [
+          {id: 1, title: 'My journey with Vue'},
+          {id: 2, title: 'Blogging with Vue'},
+          {id: 3, title: 'Why Vue is so fun'}
+        ],
+        postFontSize: 1,
+        currentTab: 'Home',
+        tabs: ['Home', 'Posts', 'Archive'],
+      }
+    },
+    computed: {
+      currentTabComponent() {
+        return 'tab-' + this.currentTab.toLowerCase()
+      }
+    },
+    // 局部注册
+    components: {
+      TodoList
+    },
+  })
+  // 全局注册
+  app.component('blog-post', {
+    props: ['title'],
+    template: `
+      <div class="blog-post">
+      <h4> {{ title }}</h4>
+      <button @click="$emit('enlargeText', 1)">enlarge text</button>
+      </div>
+    `
+  })
+  app.component('alert-box', {
+    template: `
+    <div>
+      <strong>error</strong>
+      <slot></slot>
+    </div>
+    `
+  })
+  app.component('tab-home', {
+    template: `<div class="demo-tab">Home component</div>`
+  })
+  app.component('tab-posts', {
+    template: `<div class="demo-tab">Posts component</div>`
+  })
+  app.component('tab-archive', {
+    template: `<div class="demo-tab">Archive component</div>`
+  })
+  app.component('user-name', {
+    props: {
+      firstName: String,
+      lastName: String
+    },
+    emits: ['update:firstName', 'update:lastName'],
+    template: `
+      <input type="text" :value="firstName" @input="$emit('update:firstName', $event.target.value)">
+      <input type="text" :value="lastName" @input="$emit('update:lastName', $event.target.value)">
+    `
+  })
+  app.component('my-component', {
+    props: {
+      modelValue: String,
+      // 添加到组件 v-model 的修饰符通过该属性提供给组件
+      modelModifiers: {
+        default: () => ({})
+      }
+    },
+    emits: ['update:modelValue'],
+    template: `<input type="text" :value="modelValue" @input="emitValue"> `,
+    methods: {
+      emitValue(e) {
+        let value = e.target.value
+        if (this.modelModifiers.capitalize) {
+          value = value.charAt(0).toUpperCase() + value.slice(1)
+        }
+        this.$emit('update:modelValue', value)
+      }
+    },
+    created() {
+      console.log(this.modelModifiers)
+    }
+  })
+
+
+  app.mount('#todo-list-app')
+
+</script>
+
+</html>

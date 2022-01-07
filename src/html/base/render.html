@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>render</title>
+  <script src="./vue@3.2.26.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <anchored-heading :level="4">hello world!</anchored-heading>
+
+  <ul v-if="items.length">
+    <li v-for="item in items">{{ item.name }}</li>
+  </ul>
+  <p v-else>no items found</p>
+
+  <my-ul :items="items"></my-ul>
+</div>
+</body>
+
+<script>
+
+  let {h, render} = Vue
+
+  let app = Vue.createApp({
+    data() {
+      return {
+        items: [{name: 'a'}, {name: 'b'}, {name: 'c'}]
+      }
+    }
+  })
+
+  function getChildrenTextContent(children) {
+    return children.map(node => {
+      return typeof node.children === 'string' ?
+        node.children :
+        Array.isArray(node.children)
+          ? getChildrenTextContent(node.children)
+          : ''
+    }).join('')
+  }
+
+  app.component('anchored-heading', {
+    props: {
+      level: {
+        type: Number,
+        required: true
+      }
+    },
+    render() {
+      const headingId = getChildrenTextContent(this.$slots.default())
+        .toLowerCase()
+        .replace(/\W+/g, '-')
+        .replace(/(^-|-$)/g, '')
+
+      return h(
+        'h' + this.level,
+        [
+          h('a',
+            {
+              name: headingId,
+              href: '#' + headingId
+            },
+            this.$slots.default())
+        ])
+    }
+  })
+
+  // 渲染函数
+  app.component('my-ul', {
+    props: ['items'],
+    render() {
+      if (this.items.length) {
+        return h('ul', this.items.map(item => {
+          return h('li', item.name)
+        }))
+      } else {
+        return h('p', 'no item found')
+      }
+    }
+  })
+
+
+  app.mount('#app')
+
+</script>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>mixin</title>
+  <script src="./vue@3.2.26.js"></script>
+</head>
+<body>
+<div id="app">
+
+</div>
+</body>
+
+<script>
+
+  const mixin = {
+    data() {
+      return {
+        message: 'hello',
+        foo: 'abc'
+      }
+    },
+    created() {
+      console.log('from mixin')
+    }
+  }
+
+  Vue.createApp({
+    mixins: [mixin],
+    data() {
+      return {
+        message: 'world',
+        bar: 'def'
+      }
+    },
+    created() {
+      console.log(this.$data)
+    }
+  }).mount('#app')
+</script>
+</html>
