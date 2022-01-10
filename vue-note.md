@@ -1249,3 +1249,257 @@ directives: {
 
 
 ##### Vue2 中更改检测
+
+
+
+
+
+### API 参考
+
+
+
+#### 应用配置
+
+
+
+#### 应用API
+
+
+
+#### 选项
+
+##### data
+
+该函数返回组件实例的 data 对象
+
+实例创建之后，可以通过 `vm.$data` 访问原始数据对象。组件实例也代理了 data 对象上所有的 property，因此访问 `vm.a` 等价于访问 `vm.$data.a`
+
+
+
+##### props
+
+用于从父组件接收数据的数组或对象。
+
+
+
+##### computed
+
+计算属性将被混入到组件实例中
+
+
+
+##### methods
+
+methods 将被混入到组件实例中。
+
+**不应该使用箭头函数来定义 method 函数**
+
+
+
+##### watch
+
+一个对象，键是要侦听的响应式 property——包含了 data 或 computed property，而值是对应的回调函数。值也可以是方法名，或者包含额外选项的对象。
+
+可以提供三个选项 `deep, immediate, flush`
+
+
+
+##### emits
+
+从组件触发自定义事件，用来定义一个组件可以向其父组件触发的事件
+
+
+
+##### expose
+
+一个将暴露在公共组件实例上的 property 列表
+
+// TODO
+
+
+
+#### DOM
+
+##### template
+
+##### render
+
+
+
+#### 生命周期钩子
+
+所有生命周期钩子的 `this` 上下文将自动绑定至实例中，因此你可以访问 data、computed 和 methods。
+
+**不应该使用箭头函数来定义一个生命周期方法** 
+
+
+
+#### 选项/资源
+
+- directives：声明一组可用于组件实例中的指令
+
+- components：声明一组可用于组件实例中的组件
+
+
+
+#### 组合
+
+##### mixins  extends
+
+##### provide/inject
+
+这对选项需要一起使用，以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效。
+
+`provide` 和 `inject` 绑定并不是响应式的。这是刻意为之的。然而，如果你传入了一个响应式的对象，那么其对象的 property 仍是响应式的。
+
+##### setup
+
+是组件内部使用组合式 API 的入口点
+
+在创建组件实例时，在初始 prop 解析之后(pmdcw)立即调用 setup。在生命周期方面，它是在 beforeCreate 钩子之前调用的。
+
+如果 `setup` 返回一个对象，则该对象的属性将合并到组件模板的渲染上下文中
+
+从 setup 返回的 refs 在模板中访问时会自动解包，因此模板中不需要 .value
+
+```javascript
+// props 不可解构
+setup(props, { attrs, slots, emit, expose }) {
+  // 稍后可能会调用的函数
+  function onClick() {
+    console.log(attrs.foo) // 保证是最新引用
+  }
+}
+```
+
+
+
+#### 实例 property
+
+- $data：组件实例正在侦听的数据对象。
+- $props：当前组件接收到的 props 对象。
+- $el：组件实例正在使用的根 DOM 元素。
+- $options：用于当前组件实例的初始化选项。
+- $parent：父实例，如果当前实例有的话。
+- $root：当前组件树的根组件实例。
+- $slots：用来以编程方式访问通过插槽分发的内容。
+- $refs：一个对象，持有注册过 ref attribute 的所有 DOM 元素和组件实例。
+- $attrs：包含了父作用域中不作为组件 props 或自定义事件的 attribute 绑定和事件。
+
+
+
+#### 实例方法
+
+- $watch：侦听组件实例上的响应式 property 或函数计算结果的变化。当侦听的值是一个对象或者数组时，对其属性或元素的任何更改都不会触发侦听器，因为它们引用相同的对象/数组，返回一个取消侦听函数，用来停止触发回调
+- $emit：触发当前实例上的事件。附加参数都会传给监听器回调。
+- $forceUpdate：迫使组件实例重新渲染。
+- $nextTick：将回调延迟到下次 DOM 更新循环之后执行。
+
+
+
+#### 指令
+
+- v-text
+
+  ```html
+  <span v-text="msg"></span>
+  <!-- 等价于 -->
+  <span>{{msg}}</span>
+  ```
+
+- v-html：内容按普通 HTML 插入 - 不会作为 Vue 模板进行编译(css是有用的)
+
+- v-show
+
+- v-if / v-else-if / v-esle
+
+- v-for
+
+  ```html
+  <div v-for="(item, index) in items"></div>
+  <div v-for="(value, key, index) in object"></div>
+  ```
+
+- v-on：事件绑定 `@`(可以添加修饰符)
+
+- v-bind 属性绑定 `:`  (可以添加修饰符)
+
+  - `.camel` - 将 kebab-case attribute 名转换为 camelCase。
+  - `.prop` - 将一个绑定强制设置为一个 DOM property。3.2+
+  - `.attr` - 将一个绑定强制设置为一个 DOM attribute。3.2+
+
+- v-model：表单绑定
+
+- v-slot：插槽 `#` 提供具名插槽或需要接收 prop 的插槽。
+
+- v-pre：跳过这个元素和它的子元素的编译过程。可以用来显示原始 Mustache 标签。
+
+- v-cloak：这个指令保持在元素上直到关联组件实例结束编译，可以隐藏未编译的 Mustache 标签直到组件实例准备完毕。
+
+- v-once：只渲染元素和组件一次
+
+- v-memo：记住一个模板的子树。元素和组件上都可以使用。该指令接收一个固定长度的数组作为依赖值进行记忆比对。如果数组中的每个值都和上次渲染的时候相同，则整个该子树的更新会被跳过。
+
+- ~~v-is~~
+
+
+
+#### 特殊 attribute
+
+- key
+- ref：用来给元素或子组件注册引用信息
+- is：使用动态组件
+
+
+
+#### 内置组件
+
+- component：和上面的 is 属性使用，动态决定渲染哪个组件
+- transition
+- transition-group
+- keep-alive：缓存不活动的组件实例，而不是销毁他
+- slot：具名插槽
+- teleport：// TODO
+
+
+
+#### 响应式 API
+
+
+
+##### 响应性基础 API
+
+- reactive：返回对象的响应式副本
+  - reactive 将解包所有深层的 refs，同时维持 ref 的响应性。
+  - 当将 ref 分配给 reactive property 时，ref 将被自动解包。
+- readonly：接受一个对象 (响应式或纯对象) 或 ref 并返回原始对象的只读代理。只读代理是深层的：任何被访问的嵌套 property 也是只读的
+- isProxy：检查对象是否是由 reactive 或 readonly 创建的 proxy
+- isReactive：检查对象是否是由 reactive 创建的响应式代理
+- isReadOnly：检查对象是否是由 readonly 创建的只读代理
+- toRaw：返回 reactive 或 readonly 代理的原始对象
+- markRaw：标记一个对象，使其永远不会转换为 proxy。返回对象本身
+- shallowReactive：创建一个响应式代理，它跟踪其自身 property 的响应性，但不执行嵌套对象的深层响应式转换，当从组合式函数返回响应式对象时，toRefs 非常有用，这样消费组件就可以在不丢失响应性的情况下对返回的对象进行解构/展开
+- shallowReadonly：创建一个 proxy，使其自身的 property 为只读，但不执行嵌套对象的深度只读转换
+
+
+
+##### Refs
+
+- ref：接受一个内部值并返回一个响应式且可变的 ref 对象。ref 对象仅有一个 `.value` property，指向该内部值。如果将对象分配为 ref 值，则它将被 reactive 函数处理为深层的响应式对象
+- unref：如果参数是一个 ref，则返回内部值，否则返回参数本身
+- toRef：可以用来为原响应式对象上的某个 property 新创建一个 ref
+- toRefs：将响应式对象转换为普通对象，其中结果对象的每个 property 都是指向原始对象相应 property 的 ref
+- isRef：检查值是否为一个 ref 对象
+- customRef
+- shallowRef
+- triggerRef
+
+
+
+#### computed watch
+
+- computed：接受一个 getter 函数，并根据 getter 的返回值返回一个不可变的响应式 ref 对象
+- watchEffect：立即执行传入的一个函数，同时响应式追踪其依赖，并在其依赖变更时重新运行该函数
+- watchPostEffect：
+- watchSyncEffect：
+- watch：
