@@ -1496,10 +1496,47 @@ setup(props, { attrs, slots, emit, expose }) {
 
 
 
-#### computed watch
+##### computed watch
 
 - computed：接受一个 getter 函数，并根据 getter 的返回值返回一个不可变的响应式 ref 对象
 - watchEffect：立即执行传入的一个函数，同时响应式追踪其依赖，并在其依赖变更时重新运行该函数
 - watchPostEffect：
 - watchSyncEffect：
-- watch：
+- watch：watch 需要侦听特定的数据源，并在单独的回调函数中执行副作用。
+  - 侦听单一源：侦听器数据源可以是一个具有返回值的 getter 函数，也可以直接是一个 ref
+  - 侦听多个源：使用数组以同时侦听多个源
+
+
+
+#### 组合式 API
+
+
+
+##### setup
+
+所有声明了的 prop，不管父组件是否向其传递了，都将出现在 `props` 对象中。其中未被传入的可选的 prop 的值会是 `undefined`
+
+如果返回了渲染函数，则不能再返回其他 property。如果需要将 property 暴露给外部访问，比如通过父组件的 `ref`，可以使用 `expose`
+
+expose 只能被调用一次。如果需要暴露多个 property，则它们必须全部包含在传递给 expose 的对象中。
+
+
+
+##### 生命周期钩子
+
+##### provide/inject
+
+启用依赖注入
+
+
+
+#### 单文件组件
+
+##### 规范
+
+vue文件的组成 <template>, <script>, <style>  三个标签
+
+<script setup>
+
+该脚本会被预处理并作为组件的 setup() 函数使用，也就是说它会在每个组件实例中执行
+

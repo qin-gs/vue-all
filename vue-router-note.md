@@ -571,3 +571,47 @@ router.addRoute('admin', { path: 'settings', component: AdminSettings })
 - `router.hasRoute()`：检查路由是否存在。
 - `router.getRoutes()`：获取一个包含所有路由记录的数组。
 
+
+
+
+
+### API 参考
+
+
+
+#### composition api
+
+
+
+##### useRoute
+
+返回当前路由地址。相当于在模板中使用 $route。必须在 setup() 中调用
+
+##### useRouter
+
+返回 router 实例。相当于在模板中使用 $router。必须在 setup() 中调
+
+
+
+#### Router 属性
+
+
+
+##### currentRoute
+
+当前路由地址
+
+##### options
+
+创建 router 是传递的原始配置对象
+
+
+
+#### Router 方法
+
+- addRoute
+- beforeEach
+- forward：前进
+- getRoutes：获取所有路由记录的完整列表
+- go：在历史中前进或后退
+
